@@ -1,0 +1,78 @@
+
+# detect_from_camera:
+#   name: "Detect face from camera"
+#   description: "Capture a snapshot from camera and analyze face using Face++"
+#   fields:
+#     camera_entity:
+#       description: "Camera entity ID"
+#       required: true
+#       selector:
+#         entity:
+#           domain: camera
+
+add_faces:
+  name: "Add face to FaceSet"
+  description: "Detect face from camera and add it to a FaceSet"
+  fields:
+    camera_entity:
+      description: "Camera entity to capture image from"
+      required: true
+      selector:
+        entity:
+          domain: camera
+    user_id:
+      description: "The name or ID to associate with this face"
+      required: true
+      selector:
+        text:
+
+recognize_face:
+  name: "Recognize face from camera"
+  description: "Recognize a person by searching their face in a FaceSet"
+  fields:
+    camera_entity:
+      description: "Camera entity to capture image from"
+      required: true
+      selector:
+        entity:
+          domain: camera
+
+recognize_face_from_file:
+  name: "Recognize face from file"
+  description: "Recognize a person by searching their face in a FaceSet"
+  fields:
+    file_path:
+      description: "Full path to the image file to recognize"
+      required: true
+      selector:
+        text:
+
+# set_userid:
+#   name: "Assign user ID to face_token"
+#   description: "Assign a user ID (name) to a face_token"
+#   fields:
+#     face_token:
+#       description: "The face_token returned from detection"
+#       required: true
+#       selector:
+#         text:
+#     user_id:
+#       description: "The name or ID to associate with this face"
+#       required: true
+#       selector:
+#         text:
+
+add_faces_from_files:
+  name: "Add faces from files"
+  description: "Add faces to a FaceSet from multiple image files in a folder"
+  fields:
+    folder_path:
+      description: "Full path to folder containing images"
+      required: true
+      selector:
+        text:
+    user_id:
+      description: "The name or ID to associate with this face"
+      required: true
+      selector:
+        text:
