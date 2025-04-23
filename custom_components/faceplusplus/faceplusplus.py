@@ -11,7 +11,6 @@ class FacePlusPlusAPI:
         self.session = aiohttp.ClientSession()
 
     async def detect_face_from_base64(self, image_bytes):
-        # encoded = base64.b64encode(image_bytes).decode("utf-8")
         url = f"{API_URL}/detect"
         payload = {
             "api_key": self.api_key,
@@ -34,12 +33,11 @@ class FacePlusPlusAPI:
             return await response.json()
 
     async def search_face(self, image_bytes):
-        encoded = base64.b64encode(image_bytes).decode("utf-8")
         url = f"{API_URL}/search"
         payload = {
             "api_key": self.api_key,
             "api_secret": self.api_secret,
-            "image_base64": encoded,
+            "image_base64": image_bytes,
             "faceset_token": self.faceset_token,
         }
         async with self.session.post(url, data=payload) as response:

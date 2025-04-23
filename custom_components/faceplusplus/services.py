@@ -43,7 +43,7 @@ async def register_services(hass: HomeAssistant, api):
             if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
                 continue
             try:
-                image_b64 = get_image_base64_from_file(
+                image_b64 = await get_image_base64_from_file(
                     os.path.join(folder_path, filename)
                 )
                 detection = await api.detect_face_from_base64(image_b64)
@@ -87,7 +87,7 @@ async def register_services(hass: HomeAssistant, api):
 
     async def handle_recognize_face_from_file(call: ServiceCall):
         file_path = call.data.get("file_path")
-        image_b64 = get_image_base64_from_file(file_path)
+        image_b64 = await get_image_base64_from_file(file_path)
 
         if not image_b64:
             _LOGGER.error("No image from camera")
@@ -97,7 +97,7 @@ async def register_services(hass: HomeAssistant, api):
             _LOGGER.warning("No face match found")
             return
         best_match = result["results"][0]
-        user_id = best_match.get("user_id", "Unknown")
+        user_id = best_match.get("user_id", "Unknown") or "Unknown"
         confidence = best_match.get("confidence", 0)
         hass.states.async_set(
             "sensor.faceplusplus_recognized_person", user_id, {"confidence": confidence}

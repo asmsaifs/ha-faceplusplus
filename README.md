@@ -11,6 +11,10 @@ This Home Assistant custom integration lets you connect to [Face++ (faceplusplus
   - Uploaded image files
 - ✅ **Recognize faces** using the Face++ API
 - ✅ **UI-based configuration**
+- ✅ Emits events like:
+  - `faceplusplus_face_added`
+  - `faceplusplus_user_id_added`
+  - `faceplusplus_face_recognized`
 
 ---
 
