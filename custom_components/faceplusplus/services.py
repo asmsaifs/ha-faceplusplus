@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
 from .camera_helper import get_image_base64_from_camera, get_image_base64_from_file
 
 _LOGGER = logging.getLogger(__name__)
@@ -9,7 +9,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def register_services(hass: HomeAssistant, api):
     async def handle_add_face(call: ServiceCall):
-        entity = call.data["entity_id"]
+        entity = call.data["camera_entity"]
         user_id = call.data.get("user_id")
 
         image_b64 = await get_image_base64_from_camera(hass, entity)
@@ -66,24 +66,36 @@ async def register_services(hass: HomeAssistant, api):
                 _LOGGER.error("Error processing file %s: %s", filename, e)
 
     async def handle_recognize_face(call: ServiceCall):
-        entity = call.data["entity_id"]
+        entity = call.data["camera_entity"]
         image_b64 = await get_image_base64_from_camera(hass, entity)
 
         if not image_b64:
             _LOGGER.error("No image from camera")
-            return
+            return {"user_id": "Someone", "confidence": 0, "success": False}
         result = await api.search_face(image_b64)
         if "results" not in result:
+            hass.states.async_set(
+                "sensor.faceplusplus_recognized_person", "Someone", {"confidence": 0.0}
+            )
             _LOGGER.warning("No face match found")
-            return
+            return {"user_id": "Someone", "confidence": 0, "success": False}
         best_match = result["results"][0]
-        user_id = best_match.get("user_id", "Unknown")
+        user_id = best_match.get("user_id", "Someone") or "Someone"
         confidence = best_match.get("confidence", 0)
         hass.states.async_set(
-            "sensor.faceplusplus_recognized_person", user_id, {"confidence": confidence}
+            "sensor.faceplusplus_recognized_person",
+            user_id.capitalize(),
+            {"confidence": confidence},
         )
-        _LOGGER.info("Recognized user: %s with confidence %.2f", user_id, confidence)
+        _LOGGER.info(
+            "Recognized user: %s with confidence %.2f", user_id.capitalize(), confidence
+        )
         hass.bus.fire("faceplusplus_face_recognized", result)
+        return {
+            "user_id": user_id.capitalize(),
+            "confidence": confidence,
+            "success": True,
+        }
 
     async def handle_recognize_face_from_file(call: ServiceCall):
         file_path = call.data.get("file_path")
@@ -91,27 +103,45 @@ async def register_services(hass: HomeAssistant, api):
 
         if not image_b64:
             _LOGGER.error("No image from camera")
-            return
+            return {"user_id": "Someone", "confidence": 0, "success": False}
         result = await api.search_face(image_b64)
         if "results" not in result:
+            hass.states.async_set(
+                "sensor.faceplusplus_recognized_person", "Someone", {"confidence": 0.0}
+            )
             _LOGGER.warning("No face match found")
-            return
+            return {"user_id": "Someone", "confidence": 0, "success": False}
         best_match = result["results"][0]
-        user_id = best_match.get("user_id", "Unknown") or "Unknown"
+        user_id = best_match.get("user_id", "Someone") or "Someone"
         confidence = best_match.get("confidence", 0)
         hass.states.async_set(
-            "sensor.faceplusplus_recognized_person", user_id, {"confidence": confidence}
+            "sensor.faceplusplus_recognized_person",
+            user_id.capitalize(),
+            {"confidence": confidence},
         )
-        _LOGGER.info("Recognized user: %s with confidence %.2f", user_id, confidence)
+        _LOGGER.info(
+            "Recognized user: %s with confidence %.2f", user_id.capitalize(), confidence
+        )
         hass.bus.fire("faceplusplus_face_recognized", result)
+        return {
+            "user_id": user_id.capitalize(),
+            "confidence": confidence,
+            "success": True,
+        }
 
     hass.services.async_register("faceplusplus", "add_faces", handle_add_face)
     hass.services.async_register(
         "faceplusplus", "add_faces_from_files", handle_add_faces_from_files
     )
     hass.services.async_register(
-        "faceplusplus", "recognize_face", handle_recognize_face
+        "faceplusplus",
+        "recognize_face",
+        handle_recognize_face,
+        supports_response=SupportsResponse.OPTIONAL,
     )
     hass.services.async_register(
-        "faceplusplus", "recognize_face_from_file", handle_recognize_face_from_file
+        "faceplusplus",
+        "recognize_face_from_file",
+        handle_recognize_face_from_file,
+        supports_response=SupportsResponse.OPTIONAL,
     )
