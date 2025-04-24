@@ -7,7 +7,7 @@ from .camera_helper import get_image_base64_from_camera, get_image_base64_from_f
 _LOGGER = logging.getLogger(__name__)
 
 
-async def register_services(hass: HomeAssistant, api):
+async def register_services(hass: HomeAssistant, min_confidence: int, api):
     async def handle_add_face(call: ServiceCall):
         entity = call.data["camera_entity"]
         user_id = call.data.get("user_id")
@@ -79,7 +79,7 @@ async def register_services(hass: HomeAssistant, api):
         best_match = result["results"][0]
         user_id = best_match.get("user_id", "Someone") or "Someone"
         confidence = best_match.get("confidence", 0)
-        if confidence < 80:
+        if confidence < min_confidence:
             user_id = "Someone"
             confidence = 0
         else:

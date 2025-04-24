@@ -7,7 +7,8 @@
         "description": "Enter your API key and secret.",
         "data": {
           "api_key": "API Key",
-          "api_secret": "API Secret"
+          "api_secret": "API Secret",
+          "min_confidence": "Minimum Confidence"
         }
       }
     }

@@ -1,4 +1,3 @@
-import base64
 from .const import API_URL
 import aiohttp
 
