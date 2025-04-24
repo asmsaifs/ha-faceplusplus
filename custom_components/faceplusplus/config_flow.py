@@ -15,7 +15,6 @@ class FacePPConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             faceset_id = await self._ensure_faceset_exists(
                 user_input["api_key"],
                 user_input["api_secret"],
-                user_input.get("min_confidence", 80),
             )
             if faceset_id:
                 return self.async_create_entry(
