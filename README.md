@@ -43,10 +43,6 @@ Have [HACS](https://hacs.xyz/) installed, this will allow you to update easily.
 
 ## 📁 Configuration
 
-1. Clone this repository into your `custom_components` folder:
-   ```bash
-   git clone https://github.com/yourusername/ha-faceplusplus.git custom_components/faceplusplus
-
 > [⚙️ Configuration](https://my.home-assistant.io/redirect/config) > Devices and Services > [🧩 Integrations](https://my.home-assistant.io/redirect/integrations) > [➕ Add Integration](https://my.home-assistant.io/redirect/config_flow_start?domain=faceplusplus) > 🔍 Search `Face++`
 
 Or click: [![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=faceplusplus)
