@@ -31,7 +31,7 @@ Have [HACS](https://hacs.xyz/) installed, this will allow you to update easily.
 > [!NOTE]
 > If the button above doesn't work, add `https://github.com/asmsaifs/ha-faceplusplus` as a custom repository of type Integration in HACS.
 
-* Click Install on the `Proxmox VE` integration.
+* Click Install on the `Face++` integration.
 * Restart the Home Assistant.
 
 <details><summary>Manual installation</summary>
