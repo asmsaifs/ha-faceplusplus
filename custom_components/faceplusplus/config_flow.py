@@ -27,7 +27,11 @@ class FacePPConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
-                {vol.Required("api_key"): str, vol.Required("api_secret"): str}
+                {
+                    vol.Required("api_key"): str,
+                    vol.Required("api_secret"): str,
+                    vol.Optional("min_confidence", default=80): int,
+                }
             ),
             errors=errors,
         )
