@@ -7,7 +7,7 @@
   "integration_type": "service",
   "requirements": ["aiohttp>=3.8.0"],
   "codeowners": ["@asmsaifs"],
-  "version": "0.1.6",
+  "version": "0.1.7",
   "iot_class": "cloud_polling",
   "icon": "/img/icon.png"
 }
