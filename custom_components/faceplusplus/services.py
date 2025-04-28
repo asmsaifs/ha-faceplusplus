@@ -36,9 +36,7 @@ async def register_services(hass: HomeAssistant, min_confidence: int, api):
     async def handle_add_faces_from_files(call):
         folder_path = call.data.get("folder_path")
         user_id = call.data.get("user_id")
-
         filenames = await asyncio.to_thread(os.listdir, folder_path)
-
         for filename in filenames:
             if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
                 continue
@@ -51,7 +49,7 @@ async def register_services(hass: HomeAssistant, min_confidence: int, api):
                     _LOGGER.warning("No face found in image")
                     return
                 face_token = detection["faces"][0]["face_token"]
-
+                await asyncio.sleep(0.5)
                 result = await api.add_face_to_faceset(face_token)
                 hass.bus.fire("faceplusplus_face_added", result)
                 _LOGGER.info(
@@ -59,9 +57,11 @@ async def register_services(hass: HomeAssistant, min_confidence: int, api):
                     face_token,
                     result,
                 )
+                await asyncio.sleep(0.5)
                 result = await api.set_userid(face_token, user_id)
                 _LOGGER.info("Set user_id result: %s", result)
                 hass.bus.fire("faceplusplus_user_id_added", result)
+                await asyncio.sleep(0.5)
             except Exception as e:
                 _LOGGER.error("Error processing file %s: %s", filename, e)
 
