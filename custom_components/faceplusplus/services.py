@@ -12,26 +12,31 @@ async def register_services(hass: HomeAssistant, min_confidence: int, api):
         entity = call.data["camera_entity"]
         user_id = call.data.get("user_id")
 
-        image_b64 = await get_image_base64_from_camera(hass, entity)
-        if not image_b64:
-            _LOGGER.error("No image from camera")
-            return
-        detection = await api.detect_face_from_base64(image_b64)
-        if "faces" not in detection or not detection["faces"]:
-            _LOGGER.warning("No face found in image")
-            return
-        face_token = detection["faces"][0]["face_token"]
-
-        result = await api.add_face_to_faceset(face_token)
-        hass.bus.fire("faceplusplus_face_added", result)
-        _LOGGER.info(
-            "Added face_token %s to FaceSet %s. Result: %s",
-            face_token,
-            result,
-        )
-        result = await api.set_userid(face_token, user_id)
-        _LOGGER.info("Set user_id result: %s", result)
-        hass.bus.fire("faceplusplus_user_id_added", result)
+        try:
+            image_b64 = await get_image_base64_from_camera(hass, entity)
+            if not image_b64:
+                _LOGGER.error("No image from camera")
+                return
+            detection = await api.detect_face_from_base64(image_b64)
+            if "faces" not in detection or not detection["faces"]:
+                _LOGGER.warning("No face found in image")
+                return
+            face_token = detection["faces"][0]["face_token"]
+            await asyncio.sleep(0.5)
+            result = await api.add_face_to_faceset(face_token)
+            hass.bus.fire("faceplusplus_face_added", result)
+            _LOGGER.info(
+                "Added face_token %s to FaceSet %s. Result: %s",
+                face_token,
+                result,
+            )
+            await asyncio.sleep(0.5)
+            result = await api.set_userid(face_token, user_id)
+            _LOGGER.info("Set user_id result: %s", result)
+            hass.bus.fire("faceplusplus_user_id_added", result)
+            await asyncio.sleep(0.5)
+        except Exception as e:
+            _LOGGER.error("Error processing camera image %s: %s", entity, e)
 
     async def handle_add_faces_from_files(call):
         folder_path = call.data.get("folder_path")
@@ -44,6 +49,9 @@ async def register_services(hass: HomeAssistant, min_confidence: int, api):
                 image_b64 = await get_image_base64_from_file(
                     os.path.join(folder_path, filename)
                 )
+                if not image_b64:
+                    _LOGGER.error("No image from camera")
+                    return
                 detection = await api.detect_face_from_base64(image_b64)
                 if "faces" not in detection or not detection["faces"]:
                     _LOGGER.warning("No face found in image")
